@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 ride_events = { path = "../../crates/events" }
-prost = "0.14"
+kafka = { path = "../../crates/kafka" }
 tokio = { version = "1", features = ["full"] }
-rdkafka = { version = "0.36", features = ["tokio"] }
 uuid = { version = "1", features = ["v4"] }

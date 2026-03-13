@@ -21,8 +21,7 @@ checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 name = "api-service"
 version = "0.1.0"
 dependencies = [
- "prost",
- "rdkafka",
+ "kafka",
  "ride_events",
  "tokio",
  "uuid",
@@ -219,6 +218,18 @@ checksum = "b49715b7073f385ba4bc528e5747d02e66cb39c6146efb66b781f131f0fb399c"
 dependencies = [
  "once_cell",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "kafka"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-build",
+ "prost-types",
+ "rdkafka",
+ "ride_events",
+ "tokio",
 ]
 
 [[package]]
@@ -536,6 +547,8 @@ dependencies = [
  "prost",
  "prost-build",
  "prost-types",
+ "rdkafka",
+ "tokio",
 ]
 
 [[package]]

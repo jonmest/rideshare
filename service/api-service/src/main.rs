@@ -1,54 +1,52 @@
-use std::{time::Duration};
+use kafka::producer::{KafkaProducer, ProducerError};
+use ride_events::{Position, RideRequest, google::protobuf::Timestamp};
 
-use prost::Message;
-use rdkafka::{ClientConfig, message::{Header, OwnedHeaders}, producer::{FutureProducer, FutureRecord}};
-use ride_events::RideRequest;
-
-async fn publish() {
-    let producer: &FutureProducer = &ClientConfig::new()
-        .set("bootstrap.servers", "localhost:19092")
-        .set("message.timeout.ms", "5000")
-        .create()
-        .expect("Producer creation error");
-
-    let futures = (0..5)
-        .map(|i| async move {
-            let mut buf = Vec::new();
-            let mut msg = RideRequest::default();
-            msg.event_id = "RandomID".to_string();
-            match msg.encode(&mut buf) {
-                Ok(_) => {
-                    let delivery_status = producer
-                        .send(
-                            FutureRecord::to("ride-requests")
-                                .payload(&buf)
-                                .key(&format!("Key {}", i))
-                                .headers(OwnedHeaders::new().insert(Header {
-                                    key: "header_key",
-                                    value: Some("header_value"),
-                                })),
-                            Duration::from_secs(0),
-                        )
-                        .await;
-                    
-                    // This will be executed when the result is received.
-                    println!("Delivery status for message {} received", i);
-                    delivery_status
-                },
-                Err(_) => panic!("Failed")
-            }
-            
-            
-        })
-        .collect::<Vec<_>>();
-
-    // This loop will wait until all delivery statuses have been received.
-    for future in futures {
-        println!("Future completed. Result: {:?}", future.await);
-    }
-}
 
 #[tokio::main]
-async fn main() {
-    publish().await;
+async fn main() -> Result<(), ProducerError> {
+    let client = KafkaProducer::new("localhost:19092").map_err(ProducerError::Kafka)?;
+
+    let msg1 = RideRequest {
+                event_id: "1".to_string(),
+                ride_id: "1".to_string(),
+                rider_id: "1".to_string(),
+                pickup: Some(Position {
+                    lat: 3.0,
+                    lon: 3.1
+                }),
+                dropoff: Some(Position {
+                    lat: 3.0,
+                    lon: 3.1
+                }),
+                requested_at: Some(Timestamp {
+                    nanos: 13,
+                    seconds: 12,
+                }),
+                meta: None,
+            };
+
+    client.publish(&msg1).await?;
+
+    let msg2 = RideRequest {
+                event_id: "2".to_string(),
+                ride_id: "2".to_string(),
+                rider_id: "2".to_string(),
+                pickup: Some(Position {
+                    lat: 3.0,
+                    lon: 1.1
+                }),
+                dropoff: Some(Position {
+                    lat: 2.0,
+                    lon: 1.1
+                }),
+                requested_at: Some(Timestamp {
+                    nanos: 19,
+                    seconds: 20,
+                }),
+                meta: None,
+            };
+
+    client.publish(&msg2).await?;
+
+    Ok(())
 }
