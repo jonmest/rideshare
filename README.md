@@ -13,3 +13,30 @@ This will be a personal project for developing a rideshare like backend system i
 5. Trip starts
 6. Trip ends
 
+
+
+---
+
+## Services
+api-service
+publishes commands/events into Kafka
+
+driver-service
+tracks driver status and location
+emits driver availability/location events
+
+matching-service
+consumes ride requests + driver availability
+decides assignment
+
+trip-service
+owns trip lifecycle
+consumes assignment/accept/start/complete events
+materializes current trip state
+
+## Kafka topics
+ride-requests
+driver-location-updates
+driver-availability
+ride-assignments
+trip-events

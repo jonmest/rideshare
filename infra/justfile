@@ -1,0 +1,15 @@
+set dotenv-load
+
+init:
+  @echo "Running with REDPANDA_VERSION=$REDPANDA_VERSION"
+  docker compose up -d
+  @echo "Redpanda console available at http://localhost:$CONSOLE_PORT"
+
+watch:
+  docker stats $(docker ps -q --filter label=com.docker.compose.project=$PROJECT_NAME)
+
+status:
+  docker stats $(docker ps -q --filter label=com.docker.compose.project=$PROJECT_NAME) --no-stream
+
+down:
+  docker compose down --remove-orphans -v
