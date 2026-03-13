@@ -1,3 +1,5 @@
+use ride_events::RideRequest;
+
 fn main() {
-    println!("Hello, world!");
+    let _msg = RideRequest::default();
 }

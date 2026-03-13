@@ -1,0 +1,9 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/events",
+    "service/api-service",
+    "service/driver-service",
+    "service/matching-service",
+    "service/trip-service",
+]
