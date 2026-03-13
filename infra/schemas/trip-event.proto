@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package rideshare.events;
+
+import "event-metadata.proto";
+import "google/protobuf/timestamp.proto";
+
+message TripEvent {
+  string event_id = 1;
+  string ride_id = 2;
+  google.protobuf.Timestamp occurred_at = 3;
+  rideshare.events.EventMetadata meta = 4;
+
+  oneof payload {
+    DriverAccepted driver_accepted = 10;
+    TripStarted trip_started = 11;
+    TripCompleted trip_completed = 12;
+    TripCancelled trip_cancelled = 13;
+  }
+}
+
+message DriverAccepted {
+  string driver_id = 1;
+}
+
+message TripStarted {
+  string driver_id = 1;
+}
+
+message TripCompleted {
+  string driver_id = 1;
+}
+
+message TripCancelled {
+  string driver_id = 1;
+  string reason = 2;
+}

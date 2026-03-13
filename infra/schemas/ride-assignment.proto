@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package rideshare.events;
+
+import "event-metadata.proto";
+import "google/protobuf/timestamp.proto";
+
+message RideAssignment {
+  string event_id = 1;
+  string ride_id = 2;
+  string driver_id = 3;
+  google.protobuf.Timestamp matched_at = 4;
+  uint32 match_version = 5;
+  rideshare.events.EventMetadata meta = 6;
+}

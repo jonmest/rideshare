@@ -40,3 +40,12 @@ driver-location-updates
 driver-availability
 ride-assignments
 trip-events
+
+
+| Topic                     | Key         | Producer                      | Consumer(s)                      | Why this key                          |
+| ------------------------- | ----------- | ----------------------------- | -------------------------------- | ------------------------------------- |
+| `ride-requests`           | `ride_id`   | api-service                   | matching-service, trip-service   | preserve per-ride ordering            |
+| `driver-availability`     | `driver_id` | api-service / driver-service  | driver-service, matching-service | preserve per-driver status ordering   |
+| `driver-location-updates` | `driver_id` | api-service / simulator       | driver-service, matching-service | preserve per-driver location ordering |
+| `ride-assignments`        | `ride_id`   | matching-service              | trip-service                     | assignment belongs to ride lifecycle  |
+| `trip-events`             | `ride_id`   | trip-service / driver adapter | trip-service, read model         | preserve per-ride lifecycle ordering  |

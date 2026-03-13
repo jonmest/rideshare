@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package rideshare.events;
+
+import "event-metadata.proto";
+import "google/protobuf/timestamp.proto";
+
+message Position {
+  double lat = 1;
+  double lon = 2;
+}
+
+message RideRequest {
+  string event_id = 1;
+  string ride_id = 2;
+  string rider_id = 3;
+
+  Position pickup = 4;
+  Position dropoff = 5;
+
+  google.protobuf.Timestamp requested_at = 6;
+
+  rideshare.events.EventMetadata meta = 7;
+}

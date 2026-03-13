@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package rideshare.events;
+
+import "event-metadata.proto";
+import "google/protobuf/timestamp.proto";
+
+message DriverLocationUpdate {
+  string event_id = 1;
+  string driver_id = 2;
+  double lat = 3;
+  double lon = 4;
+  google.protobuf.Timestamp recorded_at = 5;
+  rideshare.events.EventMetadata meta = 6;
+}
