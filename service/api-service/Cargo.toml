@@ -8,3 +8,7 @@ ride_events = { path = "../../crates/events" }
 kafka = { path = "../../crates/kafka" }
 tokio = { version = "1", features = ["full"] }
 uuid = { version = "1", features = ["v4"] }
+axum = "0.8.8"
+serde = "1.0.228"
+tracing = "0.1"
+tracing-subscriber = "0.3"

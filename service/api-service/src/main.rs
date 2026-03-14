@@ -1,52 +1,36 @@
-use kafka::producer::{KafkaProducer, ProducerError};
-use ride_events::{Position, RideRequest, google::protobuf::Timestamp};
+use std::sync::Arc;
 
+use axum::{Router, routing::post};
+use kafka::producer::{KafkaProducer, ProducerError};
+use tracing::info;
+
+mod handler;
+mod request;
+
+#[derive(Clone)]
+struct AppState {
+    kafka_producer: Arc<KafkaProducer>,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), ProducerError> {
-    let client = KafkaProducer::new("localhost:19092").map_err(ProducerError::Kafka)?;
+    tracing_subscriber::fmt::init();
 
-    let msg1 = RideRequest {
-                event_id: "1".to_string(),
-                ride_id: "1".to_string(),
-                rider_id: "1".to_string(),
-                pickup: Some(Position {
-                    lat: 3.0,
-                    lon: 3.1
-                }),
-                dropoff: Some(Position {
-                    lat: 3.0,
-                    lon: 3.1
-                }),
-                requested_at: Some(Timestamp {
-                    nanos: 13,
-                    seconds: 12,
-                }),
-                meta: None,
-            };
+    let kafka_producer = KafkaProducer::new("localhost:19092").map_err(ProducerError::Kafka)?;
+    let state = AppState {
+        kafka_producer: Arc::new(kafka_producer),
+    };
 
-    client.publish(&msg1).await?;
+    let app = Router::new()
+        .route("/rides", post(handler::create_ride))
+        .with_state(state);
 
-    let msg2 = RideRequest {
-                event_id: "2".to_string(),
-                ride_id: "2".to_string(),
-                rider_id: "2".to_string(),
-                pickup: Some(Position {
-                    lat: 3.0,
-                    lon: 1.1
-                }),
-                dropoff: Some(Position {
-                    lat: 2.0,
-                    lon: 1.1
-                }),
-                requested_at: Some(Timestamp {
-                    nanos: 19,
-                    seconds: 20,
-                }),
-                meta: None,
-            };
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
 
-    client.publish(&msg2).await?;
+    info!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
 
     Ok(())
 }

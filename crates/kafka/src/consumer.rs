@@ -1,3 +1,5 @@
+use std::{error::Error, fmt};
+
 use prost::Message;
 use rdkafka::{ClientConfig, Message as KafkaMessage, Offset, TopicPartitionList, consumer::{CommitMode, Consumer, StreamConsumer}, error::KafkaError};
 
@@ -20,6 +22,18 @@ impl From<prost::DecodeError> for ConsumerError {
         Self::Deserialization(err)
     }
 }
+
+impl fmt::Display for ConsumerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ConsumerError::Kafka(e) => write!(f, "Kafka error: {}", e),
+            ConsumerError::MissingPayload => write!(f, "Missing payload"),
+            ConsumerError::Deserialization(e) => write!(f, "Decode error: {}", e),
+        }
+    }
+}
+
+impl Error for ConsumerError {}
 
 pub struct ConsumedEvent<T> {
     pub event: T,
@@ -52,7 +66,7 @@ impl KafkaConsumer {
         self.consumer.subscribe(topics)
     }
 
-    pub async fn recv<T>(&'_ self) -> Result<ConsumedEvent<T>, ConsumerError>
+    pub async fn recv<T>(&self) -> Result<ConsumedEvent<T>, ConsumerError>
     where
         T: Message + Default,
     {
@@ -74,18 +88,24 @@ impl KafkaConsumer {
         })
     }
 
-    pub fn commit_message<T>(
+    pub fn commit_offset(
         &self,
-        event: &ConsumedEvent<T>,
+        topic: &str,
+        partition: i32,
+        processed_offset: i64,
     ) -> Result<(), KafkaError> {
         let mut tpl = TopicPartitionList::new();
 
         tpl.add_partition_offset(
-            &event.topic,
-            event.partition,
-            Offset::Offset(event.offset + 1),
+            topic,
+            partition,
+            Offset::Offset(processed_offset + 1),
         )?;
 
-        self.consumer.commit(&tpl, CommitMode::Async)
+        self.consumer.commit(&tpl, CommitMode::Sync)
+    }
+
+    pub fn commit_message<T>(&self, event: &ConsumedEvent<T>) -> Result<(), KafkaError> {
+        self.commit_offset(&event.topic, event.partition, event.offset)
     }
 }
