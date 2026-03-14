@@ -1,8 +1,41 @@
-use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
-use ride_events::{EventMetadata, Position, RideRequest};
+use axum::{Json, extract::{Path, State}, http::StatusCode, response::IntoResponse};
+use ride_events::{DriverLocationUpdate, EventMetadata, Position, RideRequest, google::protobuf::Timestamp};
 use tracing::{error, info};
 
-use crate::{AppState, request::CreateRideRequest};
+use crate::{AppState, request::{CreateRideRequest, UpdateDriverLocationRequest}};
+
+pub(crate) async fn update_driver_location(
+    axum::extract::Path(driver_id): Path<String>,
+    State(state): State<AppState>,
+    Json(payload): Json<UpdateDriverLocationRequest>
+) -> Result<impl IntoResponse, StatusCode> {
+    let event_id = uuid::Uuid::new_v4().to_string();
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as i64;
+    
+    let message = DriverLocationUpdate {
+        event_id,
+        driver_id,
+        lat: payload.lat,
+        lon: payload.lon,
+        recorded_at: Some(Timestamp { seconds: now, nanos: 0 }),
+        meta: None,
+    };
+
+    let (partition, offset) = state
+        .kafka_producer
+        .publish(&message)
+        .await
+        .map_err(|e| {
+            error!(error = ?e, "failed to publish driver location update");
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    info!(partition, offset, "published driver location update");
+    Ok((StatusCode::CREATED, Json(payload)))
+}
 
 pub(crate) async fn create_ride(
     State(state): State<AppState>,
