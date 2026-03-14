@@ -23,7 +23,8 @@ async fn main() -> Result<(), ProducerError> {
 
     let app = Router::new()
         .route("/rides", post(handler::create_ride))
-        .route("/driver/{driver_id}", post(handler::update_driver_location))
+        .route("/driver/{driver_id}/location", post(handler::update_driver_location))
+        .route("/driver/{driver_id}/availability", post(handler::update_driver_availability))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")

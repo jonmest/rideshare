@@ -62,6 +62,16 @@ impl KafkaKey for DriverLocationUpdate {
     }
 }
 
+impl DriverStatus {
+    pub fn to_int(&self) -> i32 {
+        match &self {
+            Self::Unspecified => 0,
+            Self::Available => 1,
+            Self::Unavailable => 2
+        }
+    }
+}
+
 impl TopicName for DriverAvailability {
     const TOPIC : rideshare::topic::Topic = rideshare::topic::Topic::DriverAvailability;
 }
