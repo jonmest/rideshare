@@ -1,0 +1,13 @@
+name: redis-local
+networks:
+  rideshare_network:
+    external: true
+services:
+  redis-0:
+    image: redis:7
+    container_name: redis-0
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks:
+      - rideshare_network
+    ports:
+      - 6379:6379

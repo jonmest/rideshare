@@ -1,7 +1,7 @@
 name: $PROJECT_NAME
 networks:
-  redpanda_network:
-    driver: bridge
+  rideshare_network:
+    external: true
 volumes:
   redpanda-0: null
 services:
@@ -33,7 +33,7 @@ services:
     volumes:
       - redpanda-0:/var/lib/redpanda/data
     networks:
-      - redpanda_network
+      - rideshare_network
     ports:
       - 18081:18081
       - 18082:18082
@@ -43,7 +43,7 @@ services:
     container_name: redpanda-console
     image: docker.redpanda.com/redpandadata/console:v3.6.0
     networks:
-      - redpanda_network
+      - rideshare_network
     entrypoint: /bin/sh
     command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
     environment:

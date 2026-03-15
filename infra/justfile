@@ -1,38 +1,31 @@
-set dotenv-load
 set shell := ["bash", "-cu"]
-set positional-arguments
 
-init: install-rpk
-	@echo "Running with REDPANDA_VERSION=$REDPANDA_VERSION"
-	docker compose up -d
-	@echo "Redpanda console available at http://localhost:$CONSOLE_PORT"
-	@echo "Setting up topics..."
-	docker exec redpanda-0 rpk topic create \
-		ride-requests \
-		driver-location-updates \
-		driver-availability \
-		ride-assignments \
-		trip-events
-	@echo "Registering schemas..."
-	./scripts/register-schemas.sh
-
-watch:
-  docker stats $(docker ps -q --filter label=com.docker.compose.project=$PROJECT_NAME)
-
-status:
-  docker stats $(docker ps -q --filter label=com.docker.compose.project=$PROJECT_NAME) --no-stream
+init: _create-network
+	just redpanda/init
+	just redis/init
 
 down:
-  docker compose down --remove-orphans -v
+	just redpanda/down
+	just redis/down
+	-docker network rm rideshare_network
 
-[arg("topic", help="ride-requests driver-location-updates driver-availability ride-assignments trip-events")]
-consume topic:
-  docker exec -it redpanda-0 rpk topic consume {{topic}}
+redpanda-init: _create-network
+	just redpanda/init
 
-install-rpk:
-	if command -v rpk >/dev/null 2>&1; then \
-	echo "rpk already installed: $(rpk version)"; \
-	else \
-	echo "Installing rpk..."; \
-	./scripts/install-rpk.sh; \
-	fi
+redpanda-down:
+	just redpanda/down
+
+redis-init: _create-network
+	just redis/init
+
+redis-down:
+	just redis/down
+
+watch:
+	docker stats $(docker ps -q --filter network=rideshare_network)
+
+status:
+	docker stats $(docker ps -q --filter network=rideshare_network) --no-stream
+
+_create-network:
+	-docker network create rideshare_network 2>/dev/null || true
