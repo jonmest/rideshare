@@ -11,3 +11,18 @@ services:
       - rideshare_network
     ports:
       - 6379:6379
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    networks:
+      - rideshare_network
+    ports:
+      - 5540:5540
+    depends_on:
+      - redis-0
+    environment:
+      - RI_PROXY_PATH=/
+    volumes:
+      - redisinsight:/data
+volumes:
+  redisinsight: null

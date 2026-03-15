@@ -2,7 +2,13 @@ set shell := ["bash", "-cu"]
 
 init:
 	docker compose up -d
+	@echo "Waiting for RedisInsight to start..."
+	@until curl -sf http://localhost:5540/api/health > /dev/null 2>&1; do sleep 1; done
+	@curl -sf -X POST http://localhost:5540/api/databases \
+		-H 'Content-Type: application/json' \
+		-d '{"name":"local","host":"redis-0","port":6379}' > /dev/null 2>&1 || true
 	@echo "Redis available at localhost:6379"
+	@echo "RedisInsight available at http://localhost:5540"
 
 watch:
 	docker stats $(docker ps -q --filter name=redis-0)
