@@ -6,22 +6,22 @@ fn main() -> Result<()> {
     config.compile_well_known_types();
 
     let protos = &[
-        "../../infra/schemas/event-metadata.proto",
-        "../../infra/schemas/ride-request.proto",
-        "../../infra/schemas/driver-availability.proto",
-        "../../infra/schemas/driver-location-update.proto",
-        "../../infra/schemas/ride-assignment.proto",
-        "../../infra/schemas/trip-event.proto",
+        "../../infra/redpanda/schemas/event-metadata.proto",
+        "../../infra/redpanda/schemas/ride-request.proto",
+        "../../infra/redpanda/schemas/driver-availability.proto",
+        "../../infra/redpanda/schemas/driver-location-update.proto",
+        "../../infra/redpanda/schemas/ride-assignment.proto",
+        "../../infra/redpanda/schemas/trip-event.proto",
     ];
 
     let includes = &[
-        "../../infra/schemas",
+        "../../infra/redpanda/schemas",
     ];
 
     for proto in protos {
         println!("cargo:rerun-if-changed={proto}");
     }
-    println!("cargo:rerun-if-changed=../../infra/schemas/google/protobuf/timestamp.proto");
+    println!("cargo:rerun-if-changed=../../infra/redpanda/schemas/google/protobuf/timestamp.proto");
 
     config.compile_protos(protos, includes)?;
 

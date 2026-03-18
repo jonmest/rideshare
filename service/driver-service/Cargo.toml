@@ -4,3 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+tokio = { version = "1", features = ["full"] }
+
+ride_events = { path = "../../crates/events" }
+kafka = { path = "../../crates/kafka" }
+h3o = { version = "0.9.4", features = ["serde"]}
+r2d2 = "0.8.10"
+redis = { version = "1.0.5", features = ["r2d2"]}
