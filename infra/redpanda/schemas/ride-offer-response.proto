@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package rideshare.events;
+
+import "event-metadata.proto";
+import "google/protobuf/timestamp.proto";
+
+enum OfferDecision {
+  OFFER_DECISION_UNSPECIFIED = 0;
+  OFFER_DECISION_ACCEPTED = 1;
+  OFFER_DECISION_REJECTED = 2;
+  OFFER_DECISION_EXPIRED = 3;
+}
+
+message RideOfferResponse {
+  string event_id = 1;
+  string ride_id = 2;
+  string driver_id = 3;
+  uint32 match_version = 4;
+
+  OfferDecision decision = 5;
+  google.protobuf.Timestamp responded_at = 6;
+
+  rideshare.events.EventMetadata meta = 7;
+}

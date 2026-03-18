@@ -11,6 +11,8 @@ init: install-rpk
 		ride-requests \
 		driver-location-updates \
 		driver-availability \
+		ride-offers \
+		ride-offer-responses \
 		ride-assignments \
 		trip-events
 	@echo "Registering schemas..."
@@ -25,7 +27,7 @@ status:
 down:
   docker compose down --remove-orphans -v
 
-[arg("topic", help="ride-requests driver-location-updates driver-availability ride-assignments trip-events")]
+[arg("topic", help="ride-requests driver-location-updates driver-availability ride-offers ride-offer-responses ride-assignments trip-events")]
 consume topic:
   docker exec -it redpanda-0 rpk topic consume {{topic}}
 

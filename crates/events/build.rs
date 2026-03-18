@@ -11,6 +11,8 @@ fn main() -> Result<()> {
         "../../infra/redpanda/schemas/driver-availability.proto",
         "../../infra/redpanda/schemas/driver-location-update.proto",
         "../../infra/redpanda/schemas/ride-assignment.proto",
+        "../../infra/redpanda/schemas/ride-offer.proto",
+        "../../infra/redpanda/schemas/ride-offer-response.proto",
         "../../infra/redpanda/schemas/trip-event.proto",
     ];
 

@@ -10,6 +10,8 @@ pub mod rideshare {
             RideRequests,
             DriverLocationUpdates,
             DriverAvailability,
+            RideOffers,
+            RideOfferResponses,
             RideAssignments,
             TripEvents,
         }
@@ -20,6 +22,8 @@ pub mod rideshare {
                     Topic::RideRequests => "ride-requests",
                     Topic::DriverLocationUpdates => "driver-location-updates",
                     Topic::DriverAvailability => "driver-availability",
+                    Topic::RideOffers => "ride-offers",
+                    Topic::RideOfferResponses => "ride-offer-responses",
                     Topic::RideAssignments => "ride-assignments",
                     Topic::TripEvents => "trip-events",
                 }
@@ -79,6 +83,26 @@ impl TopicName for DriverAvailability {
 impl KafkaKey for DriverAvailability {
     fn kafka_key(&self) -> &str {
         &self.driver_id
+    }
+}
+
+impl TopicName for RideOffer {
+    const TOPIC : rideshare::topic::Topic = rideshare::topic::Topic::RideOffers;
+}
+
+impl KafkaKey for RideOffer {
+    fn kafka_key(&self) -> &str {
+        &self.driver_id
+    }
+}
+
+impl TopicName for RideOfferResponse {
+    const TOPIC : rideshare::topic::Topic = rideshare::topic::Topic::RideOfferResponses;
+}
+
+impl KafkaKey for RideOfferResponse {
+    fn kafka_key(&self) -> &str {
+        &self.ride_id
     }
 }
 

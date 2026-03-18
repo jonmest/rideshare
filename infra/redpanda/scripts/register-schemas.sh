@@ -59,6 +59,16 @@ create_schema \
   --references "event-metadata.proto:event-metadata-value:1,google/protobuf/timestamp.proto:google-protobuf-timestamp:1"
 
 create_schema \
+  "ride-offer-value" \
+  "$SCHEMA_DIR/ride-offer.proto" \
+  --references "event-metadata.proto:event-metadata-value:1,google/protobuf/timestamp.proto:google-protobuf-timestamp:1"
+
+create_schema \
+  "ride-offer-response-value" \
+  "$SCHEMA_DIR/ride-offer-response.proto" \
+  --references "event-metadata.proto:event-metadata-value:1,google/protobuf/timestamp.proto:google-protobuf-timestamp:1"
+
+create_schema \
   "trip-event-value" \
   "$SCHEMA_DIR/trip-event.proto" \
   --references "event-metadata.proto:event-metadata-value:1,google/protobuf/timestamp.proto:google-protobuf-timestamp:1"
